@@ -1,6 +1,7 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
 import { UserService } from '../user.service';
 import { User } from '../model/user';
+import { EmitterService } from '../emitter.service';
 
 @Component({
   selector: 'app-user',
@@ -9,9 +10,11 @@ import { User } from '../model/user';
 })
 export class UserComponent implements OnInit, OnChanges {
 
+  @Input() listId: string;
+
   users: User[];
 
-  constructor(public userService:UserService) {
+  constructor(public userService: UserService) {
   }
 
   ngOnInit() {
@@ -22,18 +25,21 @@ export class UserComponent implements OnInit, OnChanges {
 
     this.userService.findAll()
     .subscribe(
-        users => this.users = users,
-        err => {
-            console.log(err);
-        });
-
-    console.log(JSON.stringify(this.users));
+      users => {
+        this.users = users;
+        console.log(JSON.stringify(this.users))
+      },
+      err => {
+          console.log(err);
+      }
+    );
   }
 
-  ngOnChanges(changes:any) {
+  ngOnChanges(changes: any) {
+    EmitterService.get(this.listId).subscribe((users: User[]) => { this.findAll()});
       // Listen to the 'list'emitted event so as populate the model
       // with the event payload
-      //EmitterService.get(this.listId).subscribe((comments:Comment[]) => { this.loadComments()});
+      // EmitterService.get(this.listId).subscribe((comments:Comment[]) => { this.loadComments()});
   }
 
 }
